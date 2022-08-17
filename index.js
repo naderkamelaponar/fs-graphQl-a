@@ -102,7 +102,7 @@ type Mutation {
         title:String!
         author:String!
         published:Int!
-        geners:[String!]!
+        genres:[String!]!
     ):Book,
     editAuthor(
         name:String!
