@@ -28,7 +28,9 @@ const resolvers = {
         allBooks:  async ()=>  { return await Book.find()}
     },
     Mutation:{
-        addBook:async (_,args)=>{
+        addBook:async (_,args,context)=>{
+            const currentUser = context.currentUser
+            if (!currentUser) throw new AuthenticationError("not authenticated")
             const author = await Author.findOne({name:args.author})
             const newBook=new Book({...args,author})
     
@@ -36,7 +38,6 @@ const resolvers = {
                 await newBook.save()
             } 
             catch(error){
-                console.log('err,',error)
                 throw new UserInputError(error.message)
             }
             return newBook

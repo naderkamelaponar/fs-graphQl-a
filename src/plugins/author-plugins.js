@@ -45,7 +45,9 @@ type Author{
               }
               return author
           },
-          editBorn: async (_,args)=>{
+          editBorn: async (_,args,context)=>{
+            const currentUser = context.currentUser
+            if (!currentUser) throw new AuthenticationError("not authenticated")
            const author = await Author.findOneAndUpdate({name:args.name},{born:args.born},{
             new:true
            })
