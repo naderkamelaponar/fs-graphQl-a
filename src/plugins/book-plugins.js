@@ -12,7 +12,7 @@ type Book {
 }
 
 type Query {
-    allBooks:[Book!]!
+    allBooks(genre:String):[Book!]!
 }
 type Mutation {
     addBook(
@@ -25,13 +25,16 @@ type Mutation {
 `
 const resolvers = {
     Query:{
-        allBooks:  async ()=>  { return await Book.find()}
+        allBooks:  async (_,args)=>  {     
+            return args.genre? await Book.find({genres:args.genre}): await Book.find()
+        }
     },
     Mutation:{
         addBook:async (_,args,context)=>{
             const currentUser = context.currentUser
             if (!currentUser) throw new AuthenticationError("not authenticated")
             const author = await Author.findOne({name:args.author})
+            if (!author) throw new UserInputError('not found')
             const newBook=new Book({...args,author})
     
             try {
