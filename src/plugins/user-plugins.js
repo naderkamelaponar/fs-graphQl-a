@@ -29,14 +29,17 @@ type User {
       username: String!
       password: String!
     ): Token
+    setFavourite (
+      genre: String
+    ):User
   }
+  
 `
 
 const resolvers = {
     Query:{
         me :(_, __, context) => {
-          console.log(context)
-            return context.currentUser
+          return context.currentUser
           }
     },
     Mutation:{
@@ -61,13 +64,22 @@ const resolvers = {
             if ( !user || ! password  ) {
                 throw new UserInputError("wrong credentials")
             }
-            const userForToken ={
+            const userForToken = {
                 username:user.username,
                 id:user._id
             }
             const jwtSecret= config.jwtSecret
             return { value: jwt.sign(userForToken, jwtSecret) }
-        }
+        },
+        setFavourite:async (_,args,context)=>{
+          const {genre} = args
+          const currentUser = context.currentUser
+            if (!currentUser) throw new UserInputError(" Login first ")
+           const user = await User.findOneAndUpdate({_id:currentUser.id},{favouriteGenre:genre},
+            { new:true })
+           return user
+
+      }
     }
         
 }

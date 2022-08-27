@@ -19,13 +19,12 @@ const plugins= {
 const apolloServer = new ApolloServer({
     typeDefs:plugins.typeDefs,resolvers:plugins.resolvers,
     context: async ({ req }) => {
-        const auth = req ? req.headers.authorization : null
-        if (auth && auth.toLowerCase().startsWith('bearer ')) {
+        const auth = req ? req.headers.authorization: null
+        if (auth && auth.split(" ")[0].toLowerCase() === "bearer") {
           const decodedToken = jwt.verify(
-            auth.substring(7), config.jwtSecret
+            auth.split(" ")[1], config.jwtSecret
           )
           const currentUser = await User.findById({_id:decodedToken.id})
-          
           return { currentUser }
         }
       }
